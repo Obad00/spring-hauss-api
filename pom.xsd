@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://maven.apache.org/POM/3.3.4" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="project" type="ns:projectType" xmlns:ns="http://maven.apache.org/POM/3.3.4"/>
+  <xs:complexType name="parentType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="groupId"/>
+      <xs:element type="xs:string" name="artifactId"/>
+      <xs:element type="xs:string" name="version"/>
+      <xs:element type="xs:string" name="relativePath"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="propertiesType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="java.version"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dependencyType">
+    <xs:sequence>
+      <xs:element name="groupId">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="org.springframework.boot"/>
+            <xs:enumeration value="org.projectlombok"/>
+            <xs:enumeration value="com.mysql"/>
+            <xs:enumeration value="javax.persistence"/>
+            <xs:enumeration value="org.hibernate"/>
+            <xs:enumeration value="org.flywaydb"/>
+            <xs:enumeration value="org.hibernate.validator"/>
+            <xs:enumeration value="javax.validation"/>
+            <xs:enumeration value="org.springframework.security"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element type="xs:string" name="artifactId"/>
+      <xs:element name="version" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="1.18.22"/>
+            <xs:enumeration value="8.0.33"/>
+            <xs:enumeration value="2.2"/>
+            <xs:enumeration value="5.6.9.Final"/>
+            <xs:enumeration value="6.2.0.Final"/>
+            <xs:enumeration value="2.0.1.Final"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="scope" minOccurs="0">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="provided"/>
+            <xs:enumeration value="test"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dependenciesType">
+    <xs:sequence>
+      <xs:element type="ns:dependencyType" name="dependency" maxOccurs="unbounded" minOccurs="0" xmlns:ns="http://maven.apache.org/POM/3.3.4">
+        <xs:annotation>
+          <xs:documentation> Spring Boot Starters for Web and Security  Lombok  MySQL Connector  JPA and Hibernate  Flyway for DB Migrations  Validation  Spring Boot Starter Test </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="pluginType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="groupId"/>
+      <xs:element type="xs:string" name="artifactId"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="pluginsType">
+    <xs:sequence>
+      <xs:element type="ns:pluginType" name="plugin" xmlns:ns="http://maven.apache.org/POM/3.3.4"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="buildType">
+    <xs:sequence>
+      <xs:element type="ns:pluginsType" name="plugins" xmlns:ns="http://maven.apache.org/POM/3.3.4"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="projectType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="modelVersion"/>
+      <xs:element type="ns:parentType" name="parent" xmlns:ns="http://maven.apache.org/POM/3.3.4">
+        <xs:annotation>
+          <xs:documentation> lookup parent from repository </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="xs:string" name="groupId"/>
+      <xs:element type="xs:string" name="artifactId"/>
+      <xs:element type="xs:string" name="version"/>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="ns:propertiesType" name="properties" xmlns:ns="http://maven.apache.org/POM/3.3.4"/>
+      <xs:element type="ns:dependenciesType" name="dependencies" xmlns:ns="http://maven.apache.org/POM/3.3.4"/>
+      <xs:element type="ns:buildType" name="build" xmlns:ns="http://maven.apache.org/POM/3.3.4"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

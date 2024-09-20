@@ -1,0 +1,29 @@
+## Configuration Spring
+spring:
+  ## Configuration de la BD
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_hauss?createDatabaseIfNotExist=true&userSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: root
+    password: Sqlobad64
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  ## Configuration de l'ORM JPA
+  jpa:
+    database: MYSQL # Le SGBD utilisé
+    show-sql: true # Afficher la requête SQL générée par Hibernate
+    properties:
+      hibernate:
+        session_factory: # similaire à ejb
+        dialect: org.hibernate.dialect.MySQLDialect # Le SGBD Dialect
+
+    # Configuration de Hibernate DDL Auto
+    hibernate:
+      ddl-auto: update #(none, validate, create, create-drop, create-only, update)
+
+  ## Configuration de Flyway
+  flyway:
+    enabled: true
+    locations: classpath:db/migration  # Répertoire des fichiers de migration
+
+## Configuration du server
+server:
+  port: 8081
