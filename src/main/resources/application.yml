@@ -12,7 +12,7 @@ spring:
     show-sql: true # Afficher la requête SQL générée par Hibernate
     properties:
       hibernate:
-        session_factory: # similaire à ejb
+        # session_factory: # similaire à ejb
         dialect: org.hibernate.dialect.MySQLDialect # Le SGBD Dialect
 
     # Configuration de Hibernate DDL Auto
