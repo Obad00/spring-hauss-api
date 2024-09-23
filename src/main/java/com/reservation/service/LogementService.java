@@ -33,11 +33,27 @@ public class LogementService {
 
     public Logement updateLogement(Long id, @Valid Logement logementDetails) {
         Logement logement = getLogementById(id);
+        
+        // Mettre à jour tous les champs avec les détails fournis
         logement.setTitre(logementDetails.getTitre());
         logement.setAdresse(logementDetails.getAdresse());
-        // Mettre à jour les autres champs
+        logement.setType(logementDetails.getType());
+        logement.setStatut(logementDetails.getStatut());
+        logement.setImage(logementDetails.getImage());
+        logement.setVille(logementDetails.getVille());
+        logement.setRegion(logementDetails.getRegion());
+        logement.setQuartier(logementDetails.getQuartier());
+        logement.setNombre_chambre(logementDetails.getNombre_chambre());
+        logement.setNombre_toilette(logementDetails.getNombre_toilette());
+        logement.setNombre_etage(logementDetails.getNombre_etage());
+        logement.setSurface(logementDetails.getSurface());
+        logement.setDescription(logementDetails.getDescription());
+        logement.setPrix(logementDetails.getPrix());
+        
+        // Sauvegarder les modifications
         return logementRepository.save(logement);
     }
+    
 
     public void deleteLogement(Long id) {
         Logement logement = getLogementById(id);

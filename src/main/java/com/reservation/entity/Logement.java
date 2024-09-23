@@ -49,13 +49,13 @@ public class Logement extends AbstractModel {
     private String quartier;
 
     @Column(nullable = false)
-    private Integer nombreChambre;
+    private Integer nombre_chambre;
 
     @Column(nullable = false)
-    private Integer nombreToilette;
+    private Integer nombre_toilette;
 
     @Column
-    private Integer nombreEtage;
+    private Integer nombre_etage;
 
     @Column(nullable = false)
     private Integer surface;
