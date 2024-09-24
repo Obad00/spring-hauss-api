@@ -56,5 +56,11 @@ public class User extends AbstractModel {
     @OneToMany(mappedBy = "user")
     private Set<Notification> notifications;
 
-    
+    @Column(nullable = false)
+    private boolean enabled; // Champ pour indiquer si l'utilisateur est activé
+
+    // Méthode pour vérifier si l'utilisateur est activé
+    public boolean isEnabled() {
+        return enabled;
+    }
 }

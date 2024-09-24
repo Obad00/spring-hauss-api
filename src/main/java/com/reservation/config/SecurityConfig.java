@@ -1,28 +1,38 @@
 package com.reservation.config;
-// package com.example.config;
 
-// import org.springframework.context.annotation.Bean;
-// import org.springframework.context.annotation.Configuration;
-// import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-// import org.springframework.security.web.SecurityFilterChain;
-// import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
-// import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
-// @Configuration
-// public class SecurityConfig {
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
 
-//     MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
-//         return new MvcRequestMatcher.Builder(introspector).servletPath("/spring-mvc");
-//     }
+    @Bean
+    public SecurityFilterChain appEndpoints(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(authorize -> authorize
+                .anyRequest().permitAll());
+        return http.build();
+    }
 
-//     @Bean
-//     SecurityFilterChain appEndpoints(HttpSecurity http, MvcRequestMatcher.Builder mvc) throws Exception {
-//         http
-//             .csrf(csrf -> csrf.disable()) // Désactiver la protection CSRF pour faciliter les tests
-//             .authorizeHttpRequests(authorize -> authorize
-//             .anyRequest().permitAll() // Permettre l'accès à toutes les requêtes sans authentification
-//             );
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Crée un bean PasswordEncoder
+    }
 
-//         return http.build();
-//     }
-// }
+    @Bean
+    public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder = 
+            http.getSharedObject(AuthenticationManagerBuilder.class);
+        // Configurer les détails de l'authentification ici
+        return authenticationManagerBuilder.build();
+    }
+}
