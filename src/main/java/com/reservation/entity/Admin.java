@@ -17,6 +17,4 @@ public class Admin extends AbstractModel {
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
-
-    // Getters and Setters
 }

@@ -3,6 +3,7 @@ package com.reservation.entity;
 import javax.persistence.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import com.reservation.enums.RoleUtilisateur;
 import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,6 +33,10 @@ public class User extends AbstractModel {
 
     @Column(nullable = false)
     private String telephone;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RoleUtilisateur role;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Locataire locataire;

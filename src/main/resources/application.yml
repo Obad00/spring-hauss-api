@@ -2,7 +2,7 @@
 spring:
   ## Configuration de la BD
   datasource:
-    url: jdbc:mysql://localhost:3306/db_hauss?createDatabaseIfNotExist=true&userSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/db_hauss?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
     username: root
     password: Sqlobad64
     driver-class-name: com.mysql.cj.jdbc.Driver
