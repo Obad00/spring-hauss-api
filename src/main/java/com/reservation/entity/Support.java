@@ -17,8 +17,8 @@ import lombok.ToString;
 public class Support extends AbstractModel {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "typeDemande")
-    private TypeDemande typeDemande;
+    @Column(name = "type_demande")
+    private TypeDemande type_demande;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
