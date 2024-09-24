@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
@@ -40,35 +40,35 @@ public class AuthController {
     private JwtUtils jwtUtils;
 
     @PostMapping("/register")
-public String register(@Valid @RequestBody UserRegistrationDTO userDTO, BindingResult bindingResult) {
-    // Vérifiez si des erreurs de validation se sont produites
-    if (bindingResult.hasErrors()) {
-        return "Erreur de validation : " + bindingResult.getAllErrors().toString();
+    public String register(@Valid @RequestBody UserRegistrationDTO userDTO, BindingResult bindingResult) {
+        // Vérifiez si des erreurs de validation se sont produites
+        if (bindingResult.hasErrors()) {
+            return "Erreur de validation : " + bindingResult.getAllErrors().toString();
+        }
+
+        // Vérifiez l'unicité de l'email
+        Optional<User> existingUser = userRepository.findByEmail(userDTO.getEmail());
+        if (existingUser.isPresent()) {
+            return "Cet email est déjà utilisé!";
+        }
+
+        // Créez un nouvel utilisateur à partir du DTO
+        User user = new User();
+        user.setNom(userDTO.getNom());
+        user.setPrenom(userDTO.getPrenom());
+        user.setAdresse(userDTO.getAdresse());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Encoder le mot de passe
+        user.setTelephone(userDTO.getTelephone());
+        user.setRole(RoleUtilisateur.valueOf(userDTO.getRole())); // Assurez-vous que le rôle est valide
+        user.setEnabled(true); // Utilisateur activé par défaut
+
+        // Enregistrez l'utilisateur
+        userRepository.save(user);
+        return "Utilisateur enregistré avec succès!";
     }
 
-    // Vérifiez l'unicité de l'email
-    Optional<User> existingUser = userRepository.findByEmail(userDTO.getEmail());
-    if (existingUser.isPresent()) {
-        return "Cet email est déjà utilisé!";
-    }
-
-    // Créez un nouvel utilisateur à partir du DTO
-    User user = new User();
-    user.setNom(userDTO.getNom());
-    user.setPrenom(userDTO.getPrenom());
-    user.setAdresse(userDTO.getAdresse());
-    user.setEmail(userDTO.getEmail());
-    user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Encoder le mot de passe
-    user.setTelephone(userDTO.getTelephone());
-    user.setRole(RoleUtilisateur.valueOf(userDTO.getRole())); // Assurez-vous que le rôle est valide
-    user.setEnabled(true); // Utilisateur activé par défaut
-
-    // Enregistrez l'utilisateur
-    userRepository.save(user);
-    return "Utilisateur enregistré avec succès!";
-}
-
-    
+        
 
 
     @PostMapping("/login")
