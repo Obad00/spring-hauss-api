@@ -14,8 +14,8 @@ import lombok.ToString;
 @Table(name = "commentaires")
 public class Commentaire extends AbstractModel {
 
-    @Column(name = "nomComplet")
-    private String nomComplet;
+    @Column(name = "nom_complet")
+    private String nom_complet;
 
     @Column(nullable = false)
     private Integer note;
@@ -27,5 +27,4 @@ public class Commentaire extends AbstractModel {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // Getters and Setters
 }
