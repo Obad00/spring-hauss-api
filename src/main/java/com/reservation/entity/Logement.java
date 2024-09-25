@@ -67,8 +67,8 @@ public class Logement extends AbstractModel {
     private Double prix;
 
     @ManyToOne
-    @JoinColumn(name = "proprietaire_id")
-    private Proprietaire proprietaire;
+    @JoinColumn(name = "user_id")
+    private User proprietaire;
 
     @ManyToOne
     @JoinColumn(name = "categorie_id")

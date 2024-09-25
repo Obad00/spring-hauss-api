@@ -26,8 +26,8 @@ public class Reservation extends AbstractModel {
     private Logement logement;
 
     @ManyToOne
-    @JoinColumn(name = "locataire_id")
-    private Locataire locataire;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(nullable = false)
     private Boolean deletedByOwner;

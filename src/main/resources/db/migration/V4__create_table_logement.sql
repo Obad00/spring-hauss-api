@@ -14,8 +14,8 @@ CREATE TABLE logements (
     surface INT NOT NULL,
     description TEXT NOT NULL,
     prix DECIMAL(10, 2) NOT NULL,
-    proprietaire_id BIGINT,
+    user_id BIGINT,
     categorie_id BIGINT,
-    FOREIGN KEY (proprietaire_id) REFERENCES proprietaires(id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (categorie_id) REFERENCES categories(id)
 );

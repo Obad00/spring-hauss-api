@@ -38,14 +38,9 @@ public class User extends AbstractModel {
     @Column(nullable = false)
     private RoleUtilisateur role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Locataire locataire;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Proprietaire proprietaire;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Admin admin;
+    private Reservation admin;
 
     @OneToMany(mappedBy = "user")
     private Set<Support> supports;
