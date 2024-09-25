@@ -4,6 +4,9 @@ import com.reservation.dto.UserRegistrationDTO;
 import com.reservation.entity.User;
 import com.reservation.repository.UserRepository;
 import com.reservation.enums.RoleUtilisateur;
+import com.reservation.exception.UserNotFoundException;
+import com.reservation.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -13,7 +16,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.util.ArrayList;
 import java.util.Optional;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,6 +31,9 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserService userService;
 
     // Méthode pour enregistrer un utilisateur
     @PostMapping("/register")
@@ -145,25 +154,56 @@ public ResponseEntity<String> updateUser(@PathVariable Long id,
         return ResponseEntity.ok(userRepository.findAll());
     }
 
+    //Methode pour changer le status d'un utilisateur
     @PostMapping("/block/{id}")
-public ResponseEntity<String> blockUser(@PathVariable Long id) {
-    // Vérifier si l'utilisateur existe
-    Optional<User> optionalUser = userRepository.findById(id);
-    if (!optionalUser.isPresent()) {
-        return ResponseEntity.badRequest().body("Utilisateur non trouvé avec l'ID : " + id);
+    public ResponseEntity<String> blockUser(@PathVariable Long id) {
+        // Vérifier si l'utilisateur existe
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (!optionalUser.isPresent()) {
+            return ResponseEntity.badRequest().body("Utilisateur non trouvé avec l'ID : " + id);
+        }
+
+        // Récupérer l'utilisateur existant
+        User user = optionalUser.get();
+        
+        // Inverser l'état de l'utilisateur (bloquer ou débloquer)
+        user.setEnabled(!user.isEnabled());
+
+        // Sauvegarder les modifications
+        userRepository.save(user);
+
+        String action = user.isEnabled() ? "débloqué" : "bloqué";
+        return ResponseEntity.ok("Utilisateur " + action + " avec succès !");
+    }
+     
+    //Methode pour rechercher utilisteur avec les roles 
+    @GetMapping("/searchByRole/{role}")
+    public ResponseEntity<List<User>> getUsersByRole(@PathVariable String role) {
+        try {
+            RoleUtilisateur roleEnum = RoleUtilisateur.valueOf(role.toUpperCase());
+            List<User> users = userRepository.findByRole(roleEnum);
+            if (users.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                     .body(new ArrayList<>());
+            }
+            return ResponseEntity.ok(users);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
-    // Récupérer l'utilisateur existant
-    User user = optionalUser.get();
+    @GetMapping("/search/{query}")
+    public ResponseEntity<List<User>> searchUsers(@PathVariable String query) {
+        List<User> users = userService.findByNomOrPrenom(query);
+        return ResponseEntity.ok(users);
+    }
     
-    // Inverser l'état de l'utilisateur (bloquer ou débloquer)
-    user.setEnabled(!user.isEnabled());
 
-    // Sauvegarder les modifications
-    userRepository.save(user);
 
-    String action = user.isEnabled() ? "débloqué" : "bloqué";
-    return ResponseEntity.ok("Utilisateur " + action + " avec succès !");
-}
+    // Gérer les exceptions
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFound(UserNotFoundException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
 
 }
