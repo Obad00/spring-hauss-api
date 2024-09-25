@@ -40,7 +40,7 @@ public class User extends AbstractModel {
 
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Reservation admin;
+    private Reservation reservation;
 
     @OneToMany(mappedBy = "user")
     private Set<Support> supports;

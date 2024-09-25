@@ -68,7 +68,7 @@ public class Logement extends AbstractModel {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User proprietaire;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "categorie_id")
