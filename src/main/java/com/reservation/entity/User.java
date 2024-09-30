@@ -39,8 +39,9 @@ public class User extends AbstractModel {
     private RoleUtilisateur role;
 
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Reservation reservation;
+    @OneToMany(mappedBy = "user")
+    private Set<Reservation> reservations;
+
 
     @OneToMany(mappedBy = "user")
     private Set<Support> supports;

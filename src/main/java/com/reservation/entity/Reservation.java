@@ -1,6 +1,6 @@
 package com.reservation.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import com.reservation.enums.StatutReservation;
