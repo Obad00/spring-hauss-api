@@ -10,6 +10,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.List; // Ajoutez cette ligne
+
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -19,7 +22,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-                .anyRequest().permitAll());
+                .anyRequest().permitAll())
+                .cors(customizer -> customizer.configurationSource(corsConfigurationSource())); // Modifiez cette ligne
+
         return http.build();
     }
 
@@ -34,5 +39,21 @@ public class SecurityConfig {
             http.getSharedObject(AuthenticationManagerBuilder.class);
         // Configurer les détails de l'authentification ici
         return authenticationManagerBuilder.build();
+    }
+
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:8080")); 
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Méthodes autorisées
+        configuration.setAllowedHeaders(List.of("*")); // Autorise tous les headers
+        configuration.setAllowCredentials(true); // Autorise les informations d'identification
+        configuration.setMaxAge(3600L); // Durée de validité des CORS en secondes
+
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = 
+            new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Applique la configuration CORS à toutes les routes
+
+        return source;
     }
 }
