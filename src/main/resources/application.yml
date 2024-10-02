@@ -2,7 +2,7 @@
 spring:
   ## Configuration de la BD
   datasource:
-    url: jdbc:mysql://localhost:3306/db_hauss?createDatabaseIfNotExist=true&userSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/db_hauss?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
     username: root
     password: Sqlobad64
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -12,7 +12,7 @@ spring:
     show-sql: true # Afficher la requête SQL générée par Hibernate
     properties:
       hibernate:
-        session_factory: # similaire à ejb
+        # session_factory: # similaire à ejb
         dialect: org.hibernate.dialect.MySQLDialect # Le SGBD Dialect
 
     # Configuration de Hibernate DDL Auto
