@@ -7,11 +7,13 @@ import com.reservation.service.CustomUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import com.reservation.utils.JwtUtils;
 import com.reservation.dto.AuthRequest;
+import com.reservation.dto.AuthResponse;
 import com.reservation.dto.UserRegistrationDTO;
 import javax.validation.Valid;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
+import com.reservation.service.UserService;
 
 @RestController
 @RequestMapping("/auth")
@@ -32,6 +35,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -72,18 +78,31 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public String login(@RequestBody AuthRequest authRequest) throws Exception {
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    authRequest.getEmail(), authRequest.getPassword()));
+            // Authentifier l'utilisateur
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+            );
         } catch (AuthenticationException e) {
             throw new Exception("Invalid credentials", e);
         }
 
+        // Récupérer les détails de l'utilisateur (UserDetails)
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
-        final String jwt = jwtUtils.generateToken(userDetails.getUsername()); // Utilisez getUsername ici
 
-        return jwt;
+        // Générer le token JWT
+        final String jwt = jwtUtils.generateToken(userDetails.getUsername());
+
+        // Récupérer l'utilisateur complet via ton service utilisateur (pour obtenir plus d'infos)
+        User user = userService.findByEmail(authRequest.getEmail())
+                            .orElseThrow(() -> new Exception("User not found"));
+
+        // Créer une réponse avec le token et les informations utilisateur
+        AuthResponse authResponse = new AuthResponse(jwt, user);
+
+        // Retourner la réponse avec le token et l'utilisateur
+        return ResponseEntity.ok(authResponse);
     }
 
 }
