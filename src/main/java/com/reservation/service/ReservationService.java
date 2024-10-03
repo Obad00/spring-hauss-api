@@ -1,8 +1,11 @@
 package com.reservation.service;
 
 import com.reservation.entity.Reservation;
+import com.reservation.entity.User; // Assurez-vous d'importer votre entité User
 import com.reservation.enums.StatutReservation;
+import com.reservation.exception.UserNotFoundException;
 import com.reservation.repository.ReservationRepository;
+import com.reservation.utils.JwtUtils; // Importez votre classe JwtUtils
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +18,30 @@ public class ReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private UserService userService; // Assurez-vous que ce service est bien défini
+
+    @Autowired
+    private JwtUtils jwtUtils; // Injection de JwtUtils
+
     // Créer une réservation
-    public Reservation createReservation(Reservation reservation) {
+    public Reservation createReservation(Reservation reservation, String token) {
+        // Extraire l'email de l'utilisateur à partir du token JWT
+        String email = jwtUtils.getEmailFromToken(token); 
+        System.out.println("Email extrait du token: " + email); // Log pour débogage
+        
+        // Trouver l'utilisateur par son email
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            System.out.println("Aucun utilisateur trouvé avec l'email: " + email); // Log pour débogage
+            throw new UserNotFoundException("Utilisateur non trouvé avec l'email : " + email);
+        }
+    
+        // Associer l'utilisateur à la réservation
+        reservation.setUser(user);
         return reservationRepository.save(reservation);
     }
+    
 
     // Modifier le statut de la réservation
     public Optional<Reservation> updateReservationStatus(Long reservationId, StatutReservation newStatus) {

@@ -38,6 +38,12 @@ public class JwtUtils {
         return parseToken(token).getSubject(); // Utilisez la méthode parseToken pour obtenir les informations
     }
 
+    // Nouvelle méthode pour extraire l'email depuis le token
+    public String getEmailFromToken(String token) {
+        Claims claims = parseToken(token);
+        return claims.getSubject(); // Supposons que l'email est stocké en tant que sujet
+    }
+
     public boolean validateToken(String token, String username) {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));

@@ -2,10 +2,16 @@ package com.reservation.controller;
 
 import com.reservation.entity.Reservation;
 import com.reservation.enums.StatutReservation; // Assurez-vous d'importer votre enum
+import com.reservation.exception.UserNotFoundException;
 import com.reservation.service.ReservationService;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,11 +24,33 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
+
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
-        Reservation createdReservation = reservationService.createReservation(reservation);
+    public ResponseEntity<Reservation> createReservation(
+            @Valid @RequestBody Reservation reservation) {
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            throw new UserNotFoundException("Utilisateur non trouvé. Veuillez vous connecter.");
+        }
+        
+        // Récupérer le token de l'utilisateur depuis les headers
+        String token = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest()
+                .getHeader("Authorization");
+
+        // Assurez-vous que le token est au format correct, par exemple, retirer "Bearer " si nécessaire
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7); // Enlever "Bearer " pour obtenir le token brut
+        }
+
+        // Créer la réservation en passant le token
+        Reservation createdReservation = reservationService.createReservation(reservation, token);
+        
         return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
     }
+    
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Reservation> getReservation(@PathVariable Long id) {

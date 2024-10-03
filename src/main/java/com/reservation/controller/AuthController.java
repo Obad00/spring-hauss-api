@@ -78,31 +78,31 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws Exception {
-        try {
-            // Authentifier l'utilisateur
-            authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
-            );
-        } catch (AuthenticationException e) {
-            throw new Exception("Invalid credentials", e);
-        }
-
-        // Récupérer les détails de l'utilisateur (UserDetails)
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
-
-        // Générer le token JWT
-        final String jwt = jwtUtils.generateToken(userDetails.getUsername());
-
-        // Récupérer l'utilisateur complet via ton service utilisateur (pour obtenir plus d'infos)
-        User user = userService.findByEmail(authRequest.getEmail())
-                            .orElseThrow(() -> new Exception("User not found"));
-
-        // Créer une réponse avec le token et les informations utilisateur
-        AuthResponse authResponse = new AuthResponse(jwt, user);
-
-        // Retourner la réponse avec le token et l'utilisateur
-        return ResponseEntity.ok(authResponse);
+public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws Exception {
+    try {
+        // Authentifier l'utilisateur
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+        );
+    } catch (AuthenticationException e) {
+        throw new Exception("Invalid credentials", e);
     }
+
+    // Récupérer les détails de l'utilisateur (UserDetails)
+    final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
+
+    // Générer le token JWT
+    final String jwt = jwtUtils.generateToken(userDetails.getUsername());
+
+    // Récupérer l'utilisateur complet via ton service utilisateur (pour obtenir plus d'infos)
+    User user = userService.findByEmail(authRequest.getEmail());
+
+    // Créer une réponse avec le token et les informations utilisateur
+    AuthResponse authResponse = new AuthResponse(jwt, user);
+
+    // Retourner la réponse avec le token et l'utilisateur
+    return ResponseEntity.ok(authResponse);
+}
+
 
 }

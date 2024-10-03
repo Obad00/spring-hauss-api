@@ -6,7 +6,6 @@ import java.util.List;
 import com.reservation.repository.UserRepository;
 import com.reservation.entity.User;
 import com.reservation.exception.UserNotFoundException;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -27,12 +26,11 @@ public class UserService {
         return usersByNom;
     }
 
-    public Optional<User> findByEmail(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("Aucun utilisateur trouvé avec l'email : " + email);
-        }
-        return user;
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+            .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
     }
+    
+    
     
 }
