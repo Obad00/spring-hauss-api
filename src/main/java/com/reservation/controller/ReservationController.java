@@ -4,6 +4,7 @@ import com.reservation.entity.Reservation;
 import com.reservation.enums.StatutReservation; // Assurez-vous d'importer votre enum
 import com.reservation.exception.UserNotFoundException;
 import com.reservation.service.ReservationService;
+import com.reservation.service.EmailService;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,9 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
+    @Autowired
+    private EmailService emailService;
+
 
     @PostMapping
     public ResponseEntity<Reservation> createReservation(
@@ -37,20 +41,27 @@ public class ReservationController {
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             throw new UserNotFoundException("Utilisateur non trouvé. Veuillez vous connecter.");
         }
-        
+    
         // Récupérer le token de l'utilisateur depuis les headers
         String token = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                 .getRequest()
                 .getHeader("Authorization");
 
-        // Assurez-vous que le token est au format correct, par exemple, retirer "Bearer " si nécessaire
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7); // Enlever "Bearer " pour obtenir le token brut
         }
 
         // Créer la réservation en passant le token
         Reservation createdReservation = reservationService.createReservation(reservation, token);
+
+        // Récupérer l'email de l'utilisateur
+        String userEmail = authentication.getName(); // Ou obtenez l'email depuis l'objet `User`
         
+        // Envoyer l'email de confirmation
+        String subject = "Confirmation de votre réservation";
+        String body = "Bonjour, votre réservation a bien été effectuée. Détails de la réservation : ..."; // Personnalisez le contenu
+        emailService.sendReservationEmail(userEmail, subject, body);
+
         return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
     }
     

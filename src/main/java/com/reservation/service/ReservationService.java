@@ -29,6 +29,10 @@ public class ReservationService {
     @Autowired
     private JwtUtils jwtUtils; // Injection de JwtUtils
 
+    @Autowired
+    private EmailService emailService;
+
+    // Créer une réservation
     // Créer une réservation
     public Reservation createReservation(Reservation reservation, String token) {
         // Extraire l'email de l'utilisateur à partir du token JWT
@@ -44,7 +48,18 @@ public class ReservationService {
     
         // Associer l'utilisateur à la réservation
         reservation.setUser(user);
-        return reservationRepository.save(reservation);
+        
+        // Enregistrer la réservation en base de données
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        // Envoyer l'email de confirmation de réservation
+        String subject = "Confirmation de réservation";
+        String message = "Bonjour " + user.getPrenom() + ",\n\n" + 
+                         "Votre réservation pour le logement " + reservation.getLogement().getTitre() + 
+                         " a été confirmée avec succès.";
+        emailService.sendReservationEmail(user.getEmail(), subject, message);
+
+        return savedReservation;
     }
     
 
