@@ -5,18 +5,23 @@ import com.reservation.entity.User; // Assurez-vous d'importer votre entité Use
 import com.reservation.enums.StatutReservation;
 import com.reservation.exception.UserNotFoundException;
 import com.reservation.repository.ReservationRepository;
+import com.reservation.repository.UserRepository;
 import com.reservation.utils.JwtUtils; // Importez votre classe JwtUtils
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Collections;
 
 @Service
 public class ReservationService {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private UserService userService; // Assurez-vous que ce service est bien défini
@@ -60,9 +65,16 @@ public class ReservationService {
     }
 
     // Récupérer toutes les réservations
-    public List<Reservation> getAllReservations() {
-        return reservationRepository.findAll();
+    public List<Reservation> getReservationsByUserEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email); // Récupérer l'utilisateur par email
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get(); // Récupérer l'utilisateur
+            return reservationRepository.findByUserId(user.getId()); // Récupérer les réservations de cet utilisateur
+        }
+        return Collections.emptyList(); // Aucun utilisateur trouvé
     }
+    
+    
 
     // Supprimer une réservation
     public void deleteReservation(Long reservationId) {

@@ -13,9 +13,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.reservation.dto.ReservationDTO;
+
+
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -73,8 +77,25 @@ public class ReservationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Reservation>> getAllReservations() {
-        List<Reservation> reservations = reservationService.getAllReservations();
-        return ResponseEntity.ok(reservations);
+    public ResponseEntity<List<ReservationDTO>> getAllReservations(Authentication authentication) {
+        String nom = authentication.getName();
+        System.out.println("Utilisateur connecté : " + nom); // Log de l'utilisateur connecté
+    
+        List<Reservation> reservations = reservationService.getReservationsByUserEmail(nom);
+        System.out.println("Réservations trouvées : " + reservations.size()); // Log du nombre de réservations
+    
+        List<ReservationDTO> reservationDTOs = reservations.stream()
+            .map(reservation -> new ReservationDTO(
+                reservation.getId(),
+                reservation.getLogement(),
+                reservation.getLogement().getUser() // Récupérer l'utilisateur du logement
+            ))
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(reservationDTOs);
     }
+    
+    
+
+    
 }
