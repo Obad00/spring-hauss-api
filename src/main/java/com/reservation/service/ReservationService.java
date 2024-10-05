@@ -39,7 +39,7 @@ public class ReservationService {
         String email = jwtUtils.getEmailFromToken(token); 
         System.out.println("Email extrait du token: " + email); // Log pour débogage
         
-        // Trouver l'utilisateur par son email
+        // Trouver l'utilisateur par son email  
         User user = userService.findByEmail(email);
         if (user == null) {
             System.out.println("Aucun utilisateur trouvé avec l'email: " + email); // Log pour débogage
