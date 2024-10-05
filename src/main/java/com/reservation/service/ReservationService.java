@@ -29,8 +29,8 @@ public class ReservationService {
     @Autowired
     private JwtUtils jwtUtils; // Injection de JwtUtils
 
-    @Autowired
-    private EmailService emailService;
+    // @Autowired
+    // private EmailService emailService;
 
     // Créer une réservation
     // Créer une réservation
@@ -53,11 +53,11 @@ public class ReservationService {
         Reservation savedReservation = reservationRepository.save(reservation);
 
         // Envoyer l'email de confirmation de réservation
-        String subject = "Confirmation de réservation";
-        String message = "Bonjour " + user.getPrenom() + ",\n\n" + 
-                         "Votre réservation pour le logement " + reservation.getLogement().getTitre() + 
-                         " a été confirmée avec succès.";
-        emailService.sendReservationEmail(user.getEmail(), subject, message);
+        // String subject = "Confirmation de réservation";
+        // String message = "Bonjour " + user.getPrenom() + ",\n\n" + 
+        //                  "Votre réservation pour le logement " + reservation.getLogement().getTitre() + 
+        //                  " a été confirmée avec succès.";
+        // emailService.sendReservationEmail(user.getEmail(), subject, message);
 
         return savedReservation;
     }
