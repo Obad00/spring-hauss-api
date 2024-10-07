@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.reservation.filter.JwtFilter;
 
 import java.util.List; // Ajoutez cette ligne
 
@@ -17,13 +20,22 @@ import java.util.List; // Ajoutez cette ligne
 @EnableWebSecurity
 public class SecurityConfig {
 
+
+    @Bean
+    public JwtFilter jwtFilter() throws Exception {
+        return new JwtFilter(); // Crée une instance de  filtre JWT
+    }
     @Bean
     public SecurityFilterChain appEndpoints(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers("/api/reservations").authenticated() // Exige l'authentification pour ce point de terminaison
+            .requestMatchers("/api/logements/**").authenticated() // Exige l'authentification pour ce point de terminaison
+
                 .anyRequest().permitAll())
-                .cors(customizer -> customizer.configurationSource(corsConfigurationSource())); // Modifiez cette ligne
+                .cors(customizer -> customizer.configurationSource(corsConfigurationSource()))// Modifiez cette ligne
+                .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class); // Ajoutez le filtre ici
 
         return http.build();
     }
@@ -37,7 +49,6 @@ public class SecurityConfig {
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = 
             http.getSharedObject(AuthenticationManagerBuilder.class);
-        // Configurer les détails de l'authentification ici
         return authenticationManagerBuilder.build();
     }
 

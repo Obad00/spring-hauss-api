@@ -15,6 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Méthode pour récupérer les utilisateurs par rôle et par nom
     List<User> findByNomContaining(String nom);
     List<User> findByPrenomContaining(String prenom);
+    
 }
 
 
