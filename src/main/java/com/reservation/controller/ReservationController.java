@@ -15,6 +15,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.reservation.dto.ReservationDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import javax.validation.Valid;
@@ -32,7 +34,7 @@ public class ReservationController {
     @Autowired
     private EmailService emailService;
 
-
+    private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
     @PostMapping
     public ResponseEntity<Reservation> createReservation(
             @Valid @RequestBody Reservation reservation) {
@@ -76,10 +78,27 @@ public class ReservationController {
 
     @PutMapping("/{id}/status")
     public ResponseEntity<Reservation> updateReservationStatus(@PathVariable Long id, @RequestBody StatutReservation newStatus) {
-        return reservationService.updateReservationStatus(id, newStatus)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+    return reservationService.updateReservationStatus(id, newStatus)
+            .map(updatedReservation -> {
+                // Vérifiez si la réservation a un utilisateur et un email
+                if (updatedReservation.getUser() != null && updatedReservation.getUser().getEmail() != null) {
+                    String userEmail = updatedReservation.getUser().getEmail();
+                    String subject = "Mise à jour de votre réservation";
+                    String text = "Bonjour, le statut de votre réservation a été mis à jour en : " + newStatus;
+
+                    // Envoi de l'email à l'utilisateur
+                    try {
+                        emailService.sendReservationEmail(userEmail, subject, text);
+                    } catch (Exception e) {
+                        // Log l'erreur mais continuez la mise à jour du statut
+                        logger.error("Erreur lors de l'envoi de l'email à l'utilisateur", e);
+                    }
+                }
+
+                return ResponseEntity.ok(updatedReservation);
+            })
+            .orElse(ResponseEntity.notFound().build());
+}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {

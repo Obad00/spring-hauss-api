@@ -23,7 +23,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtFilter jwtFilter() throws Exception {
-        return new JwtFilter(); // Crée une instance de votre filtre JWT
+        return new JwtFilter(); // Crée une instance de  filtre JWT
     }
     @Bean
     public SecurityFilterChain appEndpoints(HttpSecurity http) throws Exception {
@@ -31,7 +31,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/api/reservations").authenticated() // Exige l'authentification pour ce point de terminaison
-            .requestMatchers("/api/logements").authenticated() // Exige l'authentification pour ce point de terminaison
+            .requestMatchers("/api/logements/**").authenticated() // Exige l'authentification pour ce point de terminaison
 
                 .anyRequest().permitAll())
                 .cors(customizer -> customizer.configurationSource(corsConfigurationSource()))// Modifiez cette ligne
@@ -49,7 +49,6 @@ public class SecurityConfig {
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = 
             http.getSharedObject(AuthenticationManagerBuilder.class);
-        // Configurer les détails de l'authentification ici
         return authenticationManagerBuilder.build();
     }
 
