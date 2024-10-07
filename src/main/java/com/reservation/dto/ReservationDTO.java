@@ -5,19 +5,25 @@ import com.reservation.entity.User;
 
 public class ReservationDTO {
     private Long id;
-    private Logement logement;
-    private User user;
+    private String statut; // Ajouter le statut ici
+    private Logement logement; // Supposons que vous ayez une classe Logement
+    private User user; // Supposons que vous ayez une classe User
 
     // Constructeur
-    public ReservationDTO(Long id, Logement logement, User user) {
+    public ReservationDTO(Long id, String statut, Logement logement, User user) {
         this.id = id;
+        this.statut = statut; // Initialiser le statut
         this.logement = logement;
         this.user = user;
     }
 
-    // Getters
+    // Getters et Setters
     public Long getId() {
         return id;
+    }
+
+    public String getStatut() {
+        return statut;
     }
 
     public Logement getLogement() {
@@ -26,18 +32,5 @@ public class ReservationDTO {
 
     public User getUser() {
         return user;
-    }
-
-    // Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setLogement(Logement logement) {
-        this.logement = logement;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

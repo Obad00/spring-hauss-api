@@ -187,6 +187,7 @@ public class ReservationController {
         List<ReservationDTO> reservationDTOs = reservations.stream()
             .map(reservation -> new ReservationDTO(
                 reservation.getId(),
+                reservation.getStatut().toString(), // Convertir en String si c'est une énumération
                 reservation.getLogement(),
                 reservation.getLogement().getUser() // Récupérer l'utilisateur du logement
             ))
@@ -194,6 +195,8 @@ public class ReservationController {
         
         return ResponseEntity.ok(reservationDTOs);
     }
+    
+    
     
     
 
