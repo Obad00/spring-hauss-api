@@ -1,6 +1,7 @@
 package com.reservation.controller;
 
 import com.reservation.entity.Reservation;
+import com.reservation.entity.User;
 import com.reservation.enums.StatutReservation; // Assurez-vous d'importer votre enum
 import com.reservation.exception.UserNotFoundException;
 import com.reservation.service.ReservationService;
@@ -36,9 +37,7 @@ public class ReservationController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(
-            @Valid @RequestBody Reservation reservation) {
-        
+    public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             throw new UserNotFoundException("Utilisateur non trouvé. Veuillez vous connecter.");
@@ -48,22 +47,63 @@ public class ReservationController {
         String token = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                 .getRequest()
                 .getHeader("Authorization");
-
+    
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7); // Enlever "Bearer " pour obtenir le token brut
         }
-
+    
         // Créer la réservation en passant le token
         Reservation createdReservation = reservationService.createReservation(reservation, token);
-
+    
         // Récupérer l'email de l'utilisateur
         String userEmail = authentication.getName(); // Ou obtenez l'email depuis l'objet `User`
         
-        // Envoyer l'email de confirmation
-        String subject = "Confirmation de votre réservation";
-        String body = "Bonjour, votre réservation a bien été effectuée. Détails de la réservation : ..."; // Personnalisez le contenu
-        emailService.sendReservationEmail(userEmail, subject, body);
-
+        // Détails du logement
+        String logementDetails = "Nom du logement : " + createdReservation.getLogement().getTitre() + "<br>" +
+                                 "Adresse : " + createdReservation.getLogement().getAdresse() + "<br>";
+    
+        // Préparer l'email de confirmation pour le locataire
+        String subjectForUser = "Confirmation de votre réservation";
+        String bodyForUser = "<html>" +
+                "<body>" +
+                "<h2>Bonjour,</h2>" +
+                "<p>Votre réservation a bien été effectuée avec succès.</p>" +
+                "<h3>Détails de la réservation :</h3>" +
+                "<ul>" +
+                "<li>" + logementDetails + "</li>" +
+                "</ul>" +
+                "<p>Merci de votre confiance !</p>" +
+                "<p>Cordialement,<br>L'équipe de réservation.</p>" +
+                "</body>" +
+                "</html>";
+    
+        // Envoyer l'email de confirmation au locataire
+        emailService.sendReservationEmail(userEmail, subjectForUser, bodyForUser);
+    
+        // Récupérer le propriétaire associé au logement
+        User proprietaire = createdReservation.getLogement().getUser();
+        if (proprietaire != null) {
+            // Préparer l'email pour le propriétaire
+            String ownerEmail = proprietaire.getEmail();
+            String subjectForOwner = "Nouvelle réservation pour votre logement";
+            String bodyForOwner = "<html>" +
+                    "<body>" +
+                    "<h2>Bonjour " + proprietaire.getNom() + ",</h2>" +
+                    "<p>Vous avez une nouvelle réservation pour votre logement.</p>" +
+                    "<h3>Détails de la réservation :</h3>" +
+                    "<ul>" +
+                    "<li>" + logementDetails + "</li>" +
+                    "<li><strong>Nom du locataire :</strong> " + authentication.getName() + "</li>" +
+                    "</ul>" +
+                    "<p>Merci de votre attention !</p>" +
+                    "<p>Cordialement,<br>L'équipe de réservation.</p>" +
+                    "</body>" +
+                    "</html>";
+    
+            // Envoyer l'email de notification au propriétaire
+            emailService.sendReservationEmail(ownerEmail, subjectForOwner, bodyForOwner);
+        }
+    
         return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
     }
     
@@ -78,27 +118,57 @@ public class ReservationController {
 
     @PutMapping("/{id}/status")
     public ResponseEntity<Reservation> updateReservationStatus(@PathVariable Long id, @RequestBody StatutReservation newStatus) {
-    return reservationService.updateReservationStatus(id, newStatus)
-            .map(updatedReservation -> {
-                // Vérifiez si la réservation a un utilisateur et un email
-                if (updatedReservation.getUser() != null && updatedReservation.getUser().getEmail() != null) {
-                    String userEmail = updatedReservation.getUser().getEmail();
-                    String subject = "Mise à jour de votre réservation";
-                    String text = "Bonjour, le statut de votre réservation a été mis à jour en : " + newStatus;
-
-                    // Envoi de l'email à l'utilisateur
-                    try {
-                        emailService.sendReservationEmail(userEmail, subject, text);
-                    } catch (Exception e) {
-                        // Log l'erreur mais continuez la mise à jour du statut
-                        logger.error("Erreur lors de l'envoi de l'email à l'utilisateur", e);
+        return reservationService.updateReservationStatus(id, newStatus)
+                .map(updatedReservation -> {
+                    // Vérifiez si la réservation a un utilisateur et un email
+                    if (updatedReservation.getUser() != null && updatedReservation.getUser().getEmail() != null) {
+                        String userEmail = updatedReservation.getUser().getEmail();
+                        String subject = "Mise à jour de votre réservation";
+    
+                        // Détails du logement et du propriétaire
+                        String logementDetails = "Nom du logement : " + updatedReservation.getLogement().getTitre() + "<br>" +
+                                                 "Adresse : " + updatedReservation.getLogement().getAdresse() + "<br>" +
+                                                 "Propriétaire : " + updatedReservation.getLogement().getUser().getNom() + " (" +
+                                                 updatedReservation.getLogement().getUser().getEmail() + ")"; // Supposant que l'email est aussi récupéré
+    
+                        String text = "<html>" +
+                                "<head>" +
+                                "<style>" +
+                                "    body { font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px; }" +
+                                "    .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }" +
+                                "    h2 { color: #356F37; }" +
+                                "    p { font-size: 16px; line-height: 1.5; }" +
+                                "    .footer { margin-top: 20px; font-size: 12px; color: #777; }" +
+                                "</style>" +
+                                "</head>" +
+                                "<body>" +
+                                "<div class='container'>" +
+                                "<h2>Bonjour,</h2>" +
+                                "<p>Le statut de votre réservation a été mis à jour en : <strong>" + newStatus + "</strong>.</p>" +
+                                "<p>Voici les détails de votre logement :</p>" +
+                                "<p>" + logementDetails + "</p>" +
+                                "<p>Merci de votre confiance !</p>" +
+                                "<p>Cordialement,<br>L'équipe de réservation.</p>" +
+                                "</div>" +
+                                "<div class='footer'>Cet email a été généré automatiquement. Veuillez ne pas répondre.</div>" +
+                                "</body>" +
+                                "</html>";
+    
+                        // Envoi de l'email à l'utilisateur
+                        try {
+                            emailService.sendReservationEmail(userEmail, subject, text);
+                        } catch (Exception e) {
+                            // Log l'erreur mais continuez la mise à jour du statut
+                            logger.error("Erreur lors de l'envoi de l'email à l'utilisateur", e);
+                        }
                     }
-                }
+    
+                    return ResponseEntity.ok(updatedReservation);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+    
 
-                return ResponseEntity.ok(updatedReservation);
-            })
-            .orElse(ResponseEntity.notFound().build());
-}
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {

@@ -81,11 +81,23 @@ public class AuthController {
         // Envoyer un email de confirmation
         String emailSubject = "Bienvenue sur notre plateforme!";
         String emailText = "<html>" +
+                "<head>" +
+                "<style>" +
+                "    body { font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px; }" +
+                "    .container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }" +
+                "    h2 { color: #356F37; }" +
+                "    p { font-size: 16px; line-height: 1.5; }" +
+                "    .footer { margin-top: 20px; font-size: 12px; color: #777; }" +
+                "</style>" +
+                "</head>" +
                 "<body>" +
-                "<h2 style='color: #356F37;'>Bienvenue " + user.getPrenom() + "!</h2>" +
+                "<div class='container'>" +
+                "<h2>Bienvenue " + user.getPrenom() + "!</h2>" +
                 "<p>Merci pour votre inscription sur notre plateforme.</p>" +
                 "<p>Nous sommes ravis de vous avoir avec nous!</p>" +
                 "<p>Cordialement,<br>L'équipe.</p>" +
+                "</div>" +
+                "<div class='footer'>Cet email a été généré automatiquement. Veuillez ne pas répondre.</div>" +
                 "</body>" +
                 "</html>";
     
@@ -93,6 +105,7 @@ public class AuthController {
     
         return "Utilisateur enregistré avec succès!";
     }
+    
     
         
 
