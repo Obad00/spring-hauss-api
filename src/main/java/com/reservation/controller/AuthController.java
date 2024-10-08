@@ -8,6 +8,8 @@ import com.reservation.service.EmailService;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import com.reservation.utils.JwtUtils;
+
+
 import com.reservation.dto.AuthRequest;
 import com.reservation.dto.AuthResponse;
 import com.reservation.dto.UserRegistrationDTO;
@@ -15,6 +17,7 @@ import javax.validation.Valid;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -136,6 +139,24 @@ public class AuthController {
         // Retourner la réponse avec le token et l'utilisateur
         return ResponseEntity.ok(authResponse);
     }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody String token) {
+        try {
+            // Ajoutez ici la logique pour ajouter le token à une liste noire, si nécessaire.
+            // Par exemple, vous pourriez le stocker dans une base de données ou un cache.
+    
+            return ResponseEntity.ok("Déconnexion réussie");
+        } catch (Exception e) {
+            // Log l'erreur
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Erreur lors de la déconnexion");
+        }
+    }
+    
+
 
 
 }
