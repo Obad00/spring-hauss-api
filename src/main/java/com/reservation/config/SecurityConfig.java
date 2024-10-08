@@ -31,7 +31,6 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/api/reservations").authenticated() // Exige l'authentification pour ce point de terminaison
-            .requestMatchers("/api/logements/**").authenticated() // Exige l'authentification pour ce point de terminaison
 
                 .anyRequest().permitAll())
                 .cors(customizer -> customizer.configurationSource(corsConfigurationSource()))// Modifiez cette ligne

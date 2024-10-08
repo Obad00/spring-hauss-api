@@ -52,12 +52,6 @@ public class ReservationService {
         // Enregistrer la réservation en base de données
         Reservation savedReservation = reservationRepository.save(reservation);
 
-        // Envoyer l'email de confirmation de réservation
-        // String subject = "Confirmation de réservation";
-        // String message = "Bonjour " + user.getPrenom() + ",\n\n" + 
-        //                  "Votre réservation pour le logement " + reservation.getLogement().getTitre() + 
-        //                  " a été confirmée avec succès.";
-        // emailService.sendReservationEmail(user.getEmail(), subject, message);
 
         return savedReservation;
     }
