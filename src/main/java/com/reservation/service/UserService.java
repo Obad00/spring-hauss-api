@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import com.reservation.repository.UserRepository;
 import com.reservation.entity.User;
+import com.reservation.enums.RoleUtilisateur;
 import com.reservation.exception.UserNotFoundException;
 
 @Service
@@ -31,7 +32,9 @@ public class UserService {
             .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
     }
     
-    
+    public List<User> findByRole(RoleUtilisateur role) {
+        return userRepository.findByRole(role);
+    }
     
     
 }
