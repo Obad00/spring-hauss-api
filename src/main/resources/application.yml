@@ -15,7 +15,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect # Le SGBD Dialect
     hibernate:
-      ddl-auto: update #(none, validate, create, create-drop, create-only, update)
+      ddl-auto: none #(none, validate, create, create-drop, create-only, update)
 
   ## Configuration de Flyway
   flyway:

@@ -20,8 +20,15 @@ public class Notification extends AbstractModel {
     @Column(nullable = false)
     private String message;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id") // Nom de la colonne dans la base de données
+    private Long userId; // Utilisez ce champ pour stocker l'ID de l'utilisateur
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId; // Notez que nous utilisons userId ici
+    }
 
 }
