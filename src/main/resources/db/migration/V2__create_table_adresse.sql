@@ -1,0 +1,5 @@
+CREATE TABLE adresses (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    regions VARCHAR(255) NOT NULL,
+    localite VARCHAR(255) NOT NULL
+);

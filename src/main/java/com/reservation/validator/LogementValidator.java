@@ -22,12 +22,7 @@ public class LogementValidator implements ConstraintValidator<ValidLogement, Log
             valid = false;
         }
 
-        if (logement.getAdresse() == null || logement.getAdresse().isEmpty()) {
-            context.buildConstraintViolationWithTemplate("L'adresse ne peut pas être vide")
-                   .addPropertyNode("adresse")
-                   .addConstraintViolation();
-            valid = false;
-        }
+    
 
         // Ajoutez d'autres validations ici...
 

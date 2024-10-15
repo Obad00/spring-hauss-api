@@ -39,7 +39,6 @@ public class NotificationController {
     
         // Récupérer l'utilisateur depuis votre service
         User user = userService.findByEmail(email);
-        notification.setUserId(user.getId()); // Associez l'ID de l'utilisateur ici
     
         // Créer la notification
         Notification savedNotification = notificationService.createNotification(notification);
@@ -53,7 +52,6 @@ public class NotificationController {
             Notification proprietaireNotification = new Notification();
             proprietaireNotification.setSujet(notification.getSujet());
             proprietaireNotification.setMessage(notification.getMessage());
-            proprietaireNotification.setUserId(proprietaire.getId());
     
             // Enregistrer la notification
             notificationService.createNotification(proprietaireNotification);

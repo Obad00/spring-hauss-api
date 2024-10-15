@@ -4,5 +4,7 @@ CREATE TABLE commentaires (
     note INT NOT NULL,
     description TEXT NOT NULL,
     user_id BIGINT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    logement_id BIGINT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (logement_id) REFERENCES logements(id) ON DELETE CASCADE
 );

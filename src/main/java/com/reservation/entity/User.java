@@ -1,8 +1,6 @@
 package com.reservation.entity;
 
-import javax.persistence.*;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import com.reservation.enums.RoleUtilisateur;
 import java.util.Set;
 import lombok.Data;
@@ -38,10 +36,8 @@ public class User extends AbstractModel {
     @Column(nullable = false)
     private RoleUtilisateur role;
 
-
     @OneToMany(mappedBy = "user")
     private Set<Reservation> reservations;
-
 
     @OneToMany(mappedBy = "user")
     private Set<Support> supports;
@@ -53,10 +49,19 @@ public class User extends AbstractModel {
     private Set<Notification> notifications;
 
     @Column(nullable = false)
-    private boolean enabled; // Champ pour indiquer si l'utilisateur est activé
+    private boolean enabled;
 
     // Méthode pour vérifier si l'utilisateur est activé
     public boolean isEnabled() {
         return enabled;
     }
+
+    // Relation Many-to-Many pour les favoris
+    @ManyToMany
+    @JoinTable(
+        name = "favoris", // Nom de la table intermédiaire
+        joinColumns = @JoinColumn(name = "user_id"), // Clé étrangère vers User
+        inverseJoinColumns = @JoinColumn(name = "logement_id") // Clé étrangère vers Logement
+    )
+    private Set<Logement> logementsFavoris;
 }

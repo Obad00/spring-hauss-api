@@ -27,4 +27,8 @@ public class Commentaire extends AbstractModel {
     @JoinColumn(name = "user_id")
     private User user;
 
+    // Relation Many-to-One vers Logement
+    @ManyToOne
+    @JoinColumn(name = "logement_id", nullable = false)
+    private Logement logement;
 }

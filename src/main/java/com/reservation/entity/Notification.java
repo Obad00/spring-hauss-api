@@ -1,8 +1,6 @@
 package com.reservation.entity;
 
-import javax.persistence.*;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -20,15 +18,9 @@ public class Notification extends AbstractModel {
     @Column(nullable = false)
     private String message;
 
-    @Column(name = "user_id") // Nom de la colonne dans la base de données
-    private Long userId; // Utilisez ce champ pour stocker l'ID de l'utilisateur
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId; // Notez que nous utilisons userId ici
-    }
+    // Définir la relation avec l'entité User
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
 }

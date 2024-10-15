@@ -36,7 +36,7 @@ public class LogementController {
         this.logementService = logementService;
     }
 
-      @PostMapping
+    @PostMapping
     public ResponseEntity<Logement> createLogement(@Valid @RequestBody Logement logement) {
         
         // Récupérer le token de l'utilisateur depuis les headers
@@ -73,6 +73,13 @@ public class LogementController {
         Logement createdLogement = logementService.createLogement(logement);
         return new ResponseEntity<>(createdLogement, HttpStatus.CREATED);
     }
+
+    @PostMapping("/{id}/images")
+    public ResponseEntity<?> uploadImages(@PathVariable Long id, @RequestBody List<String> url) {
+        logementService.uploadImagesToLogement(id, url);
+        return ResponseEntity.ok().body("Images ajoutées avec succès au logement.");
+    }
+
 
     @GetMapping
     public ResponseEntity<List<Logement>> getAllLogements() {
