@@ -87,6 +87,18 @@ public class LogementController {
         return ResponseEntity.ok(logements);
     }
 
+
+    @GetMapping("/monCompte") // Endpoint pour les logements de l'utilisateur connecté
+    public ResponseEntity<List<Logement>> getLogementsForCurrentUser(Authentication authentication) {
+        // Récupérer l'email de l'utilisateur connecté
+        String email = authentication.getName();
+        System.out.println("Utilisateur connecté : " + email); // Log de l'utilisateur connecté
+
+        // Récupérer les logements associés à cet utilisateur
+        List<Logement> logements = logementService.getLogementsByUserEmail(email);
+        return ResponseEntity.ok(logements);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Logement> getLogementById(@PathVariable Long id) {
         Logement logement = logementService.getLogementById(id);
