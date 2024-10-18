@@ -66,6 +66,10 @@ public Logement createLogement(@Valid Logement logement) {
         return logementRepository.findAll();
     }
 
+    public List<Logement> getLogementsByUserEmail(String email) {
+        return logementRepository.findByUserEmail(email);
+    }
+
 
     public Logement getLogementById(Long id) {
         return logementRepository.findById(id)

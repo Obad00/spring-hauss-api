@@ -1,11 +1,14 @@
 package com.reservation.controller;
 
+import com.reservation.entity.Logement;
 import com.reservation.entity.Reservation;
 import com.reservation.entity.User;
 import com.reservation.enums.StatutReservation; // Assurez-vous d'importer votre enum
 import com.reservation.exception.UserNotFoundException;
 import com.reservation.service.ReservationService;
 import com.reservation.service.EmailService;
+import com.reservation.service.LogementService;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +18,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+
+
 import com.reservation.dto.ReservationDTO;
+
 import org.slf4j.Logger;
+import java.util.Set;
+import java.util.HashSet;
 import org.slf4j.LoggerFactory;
 
 
@@ -34,6 +42,9 @@ public class ReservationController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private LogementService logementService; 
 
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
     @PostMapping
@@ -176,25 +187,43 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<ReservationDTO>> getAllReservations(Authentication authentication) {
-        String nom = authentication.getName();
-        System.out.println("Utilisateur connecté : " + nom); // Log de l'utilisateur connecté
+   @GetMapping
+public ResponseEntity<List<ReservationDTO>> getAllReservationsForOwner(Authentication authentication) {
+    // Récupérer le nom ou email de l'utilisateur connecté
+    String nom = authentication.getName();
+    System.out.println("Utilisateur connecté (propriétaire) : " + nom); // Log de l'utilisateur connecté
     
-        List<Reservation> reservations = reservationService.getReservationsByUserEmail(nom);
-        System.out.println("Réservations trouvées : " + reservations.size()); // Log du nombre de réservations
+    // Récupérer les logements possédés par cet utilisateur
+    List<Logement> logements = logementService.getLogementsByUserEmail(nom);
+    System.out.println("Logements trouvés : " + logements.size()); // Log du nombre de logements trouvés
     
-        List<ReservationDTO> reservationDTOs = reservations.stream()
-            .map(reservation -> new ReservationDTO(
-                reservation.getId(),
-                reservation.getStatut().toString(), // Convertir en String si c'est une énumération
-                reservation.getLogement(),
-                reservation.getLogement().getUser() // Récupérer l'utilisateur du logement
-            ))
-            .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(reservationDTOs);
-    }
+    // Récupérer les réservations liées à ces logements
+    List<Reservation> reservationsForOwnedLogements = reservationService.getReservationsByLogements(logements);
+    System.out.println("Réservations trouvées pour les logements : " + reservationsForOwnedLogements.size()); // Log du nombre de réservations
+
+    // Récupérer les réservations faites par cet utilisateur
+    List<Reservation> reservationsByUser = reservationService.getReservationsByUserEmail(nom);
+    System.out.println("Réservations faites par l'utilisateur : " + reservationsByUser.size()); // Log du nombre de réservations faites par l'utilisateur
+
+    // Utiliser un Set pour éviter les doublons
+    Set<Reservation> combinedReservations = new HashSet<>();
+    combinedReservations.addAll(reservationsForOwnedLogements); // Ajouter les réservations liées aux logements
+    combinedReservations.addAll(reservationsByUser); // Ajouter les réservations faites par l'utilisateur
+
+    // Transformer les réservations combinées en DTO
+    List<ReservationDTO> reservationDTOs = combinedReservations.stream()
+        .map(reservation -> new ReservationDTO(
+            reservation.getId(),
+            reservation.getStatut().toString(), // Convertir en String si c'est une énumération
+            reservation.getLogement(),
+            reservation.getLogement().getUser() // Récupérer l'utilisateur du logement
+        ))
+        .collect(Collectors.toList());
+
+    return ResponseEntity.ok(reservationDTOs);
+}
+
+
     
     
     
