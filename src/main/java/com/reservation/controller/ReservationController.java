@@ -187,41 +187,42 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
-   @GetMapping
-public ResponseEntity<List<ReservationDTO>> getAllReservationsForOwner(Authentication authentication) {
-    // Récupérer le nom ou email de l'utilisateur connecté
-    String nom = authentication.getName();
-    System.out.println("Utilisateur connecté (propriétaire) : " + nom); // Log de l'utilisateur connecté
+    @GetMapping
+    public ResponseEntity<List<ReservationDTO>> getAllReservationsForOwner(Authentication authentication) {
+        // Récupérer le nom ou email de l'utilisateur connecté
+        String nom = authentication.getName();
+        System.out.println("Utilisateur connecté (propriétaire) : " + nom); // Log de l'utilisateur connecté
+        
+        // Récupérer les logements possédés par cet utilisateur
+        List<Logement> logements = logementService.getLogementsByUserEmail(nom);
+        System.out.println("Logements trouvés : " + logements.size()); // Log du nombre de logements trouvés
+        
+        // Récupérer les réservations liées à ces logements
+        List<Reservation> reservationsForOwnedLogements = reservationService.getReservationsByLogements(logements);
+        System.out.println("Réservations trouvées pour les logements : " + reservationsForOwnedLogements.size()); // Log du nombre de réservations
     
-    // Récupérer les logements possédés par cet utilisateur
-    List<Logement> logements = logementService.getLogementsByUserEmail(nom);
-    System.out.println("Logements trouvés : " + logements.size()); // Log du nombre de logements trouvés
+        // Récupérer les réservations faites par cet utilisateur
+        List<Reservation> reservationsByUser = reservationService.getReservationsByUserEmail(nom);
+        System.out.println("Réservations faites par l'utilisateur : " + reservationsByUser.size()); // Log du nombre de réservations faites par l'utilisateur
     
-    // Récupérer les réservations liées à ces logements
-    List<Reservation> reservationsForOwnedLogements = reservationService.getReservationsByLogements(logements);
-    System.out.println("Réservations trouvées pour les logements : " + reservationsForOwnedLogements.size()); // Log du nombre de réservations
-
-    // Récupérer les réservations faites par cet utilisateur
-    List<Reservation> reservationsByUser = reservationService.getReservationsByUserEmail(nom);
-    System.out.println("Réservations faites par l'utilisateur : " + reservationsByUser.size()); // Log du nombre de réservations faites par l'utilisateur
-
-    // Utiliser un Set pour éviter les doublons
-    Set<Reservation> combinedReservations = new HashSet<>();
-    combinedReservations.addAll(reservationsForOwnedLogements); // Ajouter les réservations liées aux logements
-    combinedReservations.addAll(reservationsByUser); // Ajouter les réservations faites par l'utilisateur
-
-    // Transformer les réservations combinées en DTO
-    List<ReservationDTO> reservationDTOs = combinedReservations.stream()
-        .map(reservation -> new ReservationDTO(
-            reservation.getId(),
-            reservation.getStatut().toString(), // Convertir en String si c'est une énumération
-            reservation.getLogement(),
-            reservation.getLogement().getUser() // Récupérer l'utilisateur du logement
-        ))
-        .collect(Collectors.toList());
-
-    return ResponseEntity.ok(reservationDTOs);
-}
+        // Utiliser un Set pour éviter les doublons
+        Set<Reservation> combinedReservations = new HashSet<>();
+        combinedReservations.addAll(reservationsForOwnedLogements); // Ajouter les réservations liées aux logements
+        combinedReservations.addAll(reservationsByUser); // Ajouter les réservations faites par l'utilisateur
+    
+        // Transformer les réservations combinées en DTO
+        List<ReservationDTO> reservationDTOs = combinedReservations.stream()
+            .map(reservation -> new ReservationDTO(
+                reservation.getId(),
+                reservation.getStatut().toString(), // Convertir en String si c'est une énumération
+                reservation.getLogement(),
+                reservation.getUser() // Récupérer l'utilisateur qui a fait la réservation
+            ))
+            .collect(Collectors.toList());
+    
+        return ResponseEntity.ok(reservationDTOs);
+    }
+    
 
 
     
