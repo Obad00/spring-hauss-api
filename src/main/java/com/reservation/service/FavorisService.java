@@ -1,6 +1,7 @@
 package com.reservation.service;
 
 import com.reservation.entity.User;
+import com.reservation.dto.LogementFavoriDTO;
 import com.reservation.entity.Logement;
 import com.reservation.repository.UserRepository;
 import com.reservation.repository.LogementRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class FavorisService {
@@ -44,10 +46,25 @@ public class FavorisService {
     }
 
     // Lister les logements favoris de l'utilisateur authentifié
-    public Set<Logement> listerFavoris(String email) {
+    public Set<LogementFavoriDTO> listerFavoris(String email) {
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("Utilisateur non trouvé"));
-
-        return user.getLogementsFavoris(); // Retourne la liste des logements favoris
+    
+        // Mapper les logements favoris en DTO
+        return user.getLogementsFavoris().stream()
+            .map(logement -> new LogementFavoriDTO(
+                logement.getId(),
+                logement.getTitre(),
+                logement.getPrix(),
+                logement.getDescription(),
+                logement.getNombre_chambre(),
+                logement.getNombre_toilette(),
+                logement.getAdresse() != null ? logement.getAdresse().getRegions() : "Régions non disponibles",
+                logement.getAdresse() != null ? logement.getAdresse().getLocalite() : "Localité non disponible",
+                logement.getCategorie() != null ? logement.getCategorie().getNom() : "Catégorie non disponible"
+            ))
+            .collect(Collectors.toSet());
     }
+    
+    
 }
