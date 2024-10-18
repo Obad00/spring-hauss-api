@@ -60,6 +60,8 @@ public class Logement extends AbstractModel {
     private Set<Reservation> reservations;
 
     @ManyToMany(mappedBy = "logementsFavoris")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<User> utilisateursFavoris;
 
     @OneToMany(mappedBy = "logement")

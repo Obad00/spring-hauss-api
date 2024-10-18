@@ -59,9 +59,11 @@ public class User extends AbstractModel {
     // Relation Many-to-Many pour les favoris
     @ManyToMany
     @JoinTable(
-        name = "favoris", // Nom de la table intermédiaire
-        joinColumns = @JoinColumn(name = "user_id"), // Clé étrangère vers User
-        inverseJoinColumns = @JoinColumn(name = "logement_id") // Clé étrangère vers Logement
+        name = "favoris",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "logement_id")
     )
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Logement> logementsFavoris;
 }
