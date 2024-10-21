@@ -7,8 +7,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import com.reservation.dto.LogementFavoriDTO;
+import com.reservation.dto.LogementProprietaireDTO;
 import com.reservation.service.FavorisService;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -41,12 +43,20 @@ public class FavorisController {
     }
 
     // Lister les logements favoris
-@GetMapping
-public ResponseEntity<Set<LogementFavoriDTO>> listerFavoris() {
-    String email = getAuthenticatedEmail(); // Méthode pour récupérer l'email de l'utilisateur authentifié
-    Set<LogementFavoriDTO> logementsFavoris = favorisService.listerFavoris(email);
-    return ResponseEntity.ok(logementsFavoris); // Retourner les logements favoris
-}
+        @GetMapping
+        public ResponseEntity<Set<LogementFavoriDTO>> listerFavoris() {
+            String email = getAuthenticatedEmail(); // Méthode pour récupérer l'email de l'utilisateur authentifié
+            Set<LogementFavoriDTO> logementsFavoris = favorisService.listerFavoris(email);
+            return ResponseEntity.ok(logementsFavoris); // Retourner les logements favoris
+        }
+
+
+        @GetMapping("/mes-logements")
+        public ResponseEntity<List<LogementProprietaireDTO>> afficherLogementsFavorisPourProprietaire() {
+            String email = getAuthenticatedEmail(); 
+            List<LogementProprietaireDTO> logementsFavoris = favorisService.obtenirLogementsFavorisPourProprietaire(email);
+            return ResponseEntity.ok(logementsFavoris);
+        }
 
 
     // Méthode pour obtenir l'email de l'utilisateur authentifié

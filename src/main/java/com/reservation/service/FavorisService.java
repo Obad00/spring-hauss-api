@@ -2,6 +2,7 @@ package com.reservation.service;
 
 import com.reservation.entity.User;
 import com.reservation.dto.LogementFavoriDTO;
+import com.reservation.dto.LogementProprietaireDTO;
 import com.reservation.entity.Logement;
 import com.reservation.repository.UserRepository;
 import com.reservation.repository.LogementRepository;
@@ -9,8 +10,11 @@ import com.reservation.repository.LogementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+
 
 @Service
 public class FavorisService {
@@ -65,6 +69,31 @@ public class FavorisService {
             ))
             .collect(Collectors.toSet());
     }
+
+
+    public List<LogementProprietaireDTO> obtenirLogementsFavorisPourProprietaire(String emailProprietaire) {
+    // Récupérer tous les logements créés par le propriétaire
+    List<Logement> logements = logementRepository.findByUserEmail(emailProprietaire);
+
+    // Mapper chaque logement en DTO avec le nombre d'utilisateurs ayant mis le logement en favoris
+    return logements.stream().map(logement -> 
+    LogementProprietaireDTO.builder()
+        .id(logement.getId())
+        .titre(logement.getTitre())
+        .prix(logement.getPrix())
+        .description(logement.getDescription())
+        .nombre_chambre(logement.getNombre_chambre())
+        .nombre_toilette(logement.getNombre_toilette())
+        .adresseRegion(logement.getAdresse() != null ? logement.getAdresse().getRegions() : "Régions non disponibles")
+        .adresseLocalite(logement.getAdresse() != null ? logement.getAdresse().getLocalite() : "Localité non disponible")
+        .categorie(logement.getCategorie() != null ? logement.getCategorie().getNom() : "Catégorie non disponible")
+        .nombreUtilisateursFavoris(logement.getUtilisateursFavoris().size())
+        .build()
+).collect(Collectors.toList());
+
+}
+
+    
     
     
 }
