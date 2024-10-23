@@ -57,6 +57,10 @@ public class ReservationService {
         return savedReservation;
     }
     
+    public boolean reservationExists(Long userId, Long logementId) {
+        return reservationRepository.existsByUserIdAndLogementId(userId, logementId);
+    }
+    
 
     // Modifier le statut de la réservation
     public Optional<Reservation> updateReservationStatus(Long reservationId, StatutReservation newStatus) {

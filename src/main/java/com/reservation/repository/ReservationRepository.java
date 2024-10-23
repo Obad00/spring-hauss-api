@@ -10,4 +10,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
       // Trouver les réservations pour un utilisateur spécifique
       List<Reservation> findByUserId(Long userId); 
       List<Reservation> findByLogementIn(List<Logement> logements);  // Récupère les réservations pour une liste de logements
+      boolean existsByUserIdAndLogementId(Long userId, Long logementId);
     }

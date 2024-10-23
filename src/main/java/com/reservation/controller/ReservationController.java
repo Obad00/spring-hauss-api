@@ -6,6 +6,7 @@ import com.reservation.entity.User;
 import com.reservation.enums.StatutReservation; // Assurez-vous d'importer votre enum
 import com.reservation.exception.UserNotFoundException;
 import com.reservation.service.ReservationService;
+import com.reservation.service.CustomUserDetails;
 import com.reservation.service.EmailService;
 import com.reservation.service.LogementService;
 
@@ -17,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import com.reservation.exception.ReservationAlreadyExistsException;
 
 
 
@@ -47,76 +49,88 @@ public class ReservationController {
     private LogementService logementService; 
 
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
-    @PostMapping
-    public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            throw new UserNotFoundException("Utilisateur non trouvé. Veuillez vous connecter.");
-        }
-    
-        // Récupérer le token de l'utilisateur depuis les headers
-        String token = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                .getRequest()
-                .getHeader("Authorization");
-    
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // Enlever "Bearer " pour obtenir le token brut
-        }
-    
-        // Créer la réservation en passant le token
-        Reservation createdReservation = reservationService.createReservation(reservation, token);
-    
-        // Récupérer l'email de l'utilisateur
-        String userEmail = authentication.getName(); // Ou obtenez l'email depuis l'objet `User`
-        
-        // Détails du logement
-        String logementDetails = "Nom du logement : " + createdReservation.getLogement().getTitre() + "<br>" +
-                                 "Adresse : " + createdReservation.getLogement().getAdresse() + "<br>";
-    
-        // Préparer l'email de confirmation pour le locataire
-        String subjectForUser = "Confirmation de votre réservation";
-        String bodyForUser = "<html>" +
+   @PostMapping
+public ResponseEntity<Reservation> createReservation(@Valid @RequestBody Reservation reservation) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+        throw new UserNotFoundException("Utilisateur non trouvé. Veuillez vous connecter.");
+    }
+
+    // Récupérer l'ID de l'utilisateur
+Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
+
+    // Récupérer l'ID du logement depuis la réservation
+    Long logementId = reservation.getLogement().getId();
+
+    // Vérifier si l'utilisateur a déjà réservé ce logement
+    if (reservationService.reservationExists(userId, logementId)) {
+        throw new ReservationAlreadyExistsException("Vous avez déjà réservé ce logement.");
+    }
+
+    // Récupérer le token de l'utilisateur depuis les headers
+    String token = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+            .getRequest()
+            .getHeader("Authorization");
+
+    if (token != null && token.startsWith("Bearer ")) {
+        token = token.substring(7); // Enlever "Bearer " pour obtenir le token brut
+    }
+
+    // Créer la réservation en passant le token
+    Reservation createdReservation = reservationService.createReservation(reservation, token);
+
+    // Récupérer l'email de l'utilisateur
+    String userEmail = authentication.getName(); // Ou obtenez l'email depuis l'objet `User`
+
+    // Détails du logement
+    String logementDetails = "Nom du logement : " + createdReservation.getLogement().getTitre() + "<br>" +
+                             "Adresse : " + createdReservation.getLogement().getAdresse() + "<br>";
+
+    // Préparer l'email de confirmation pour le locataire
+    String subjectForUser = "Confirmation de votre réservation";
+    String bodyForUser = "<html>" +
+            "<body>" +
+            "<h2>Bonjour,</h2>" +
+            "<p>Votre réservation a bien été effectuée avec succès.</p>" +
+            "<h3>Détails de la réservation :</h3>" +
+            "<ul>" +
+            "<li>" + logementDetails + "</li>" +
+            "</ul>" +
+            "<p>Merci de votre confiance !</p>" +
+            "<p>Cordialement,<br>L'équipe de réservation.</p>" +
+            "</body>" +
+            "</html>";
+
+    // Envoyer l'email de confirmation au locataire
+    emailService.sendReservationEmail(userEmail, subjectForUser, bodyForUser);
+
+    // Récupérer le propriétaire associé au logement
+    User proprietaire = createdReservation.getLogement().getUser();
+    if (proprietaire != null) {
+        // Préparer l'email pour le propriétaire
+        String ownerEmail = proprietaire.getEmail();
+        String subjectForOwner = "Nouvelle réservation pour votre logement";
+        String bodyForOwner = "<html>" +
                 "<body>" +
-                "<h2>Bonjour,</h2>" +
-                "<p>Votre réservation a bien été effectuée avec succès.</p>" +
+                "<h2>Bonjour " + proprietaire.getNom() + ",</h2>" +
+                "<p>Vous avez une nouvelle réservation pour votre logement.</p>" +
                 "<h3>Détails de la réservation :</h3>" +
                 "<ul>" +
                 "<li>" + logementDetails + "</li>" +
+                "<li><strong>Nom du locataire :</strong> " + authentication.getName() + "</li>" +
                 "</ul>" +
-                "<p>Merci de votre confiance !</p>" +
+                "<p>Merci de votre attention !</p>" +
                 "<p>Cordialement,<br>L'équipe de réservation.</p>" +
                 "</body>" +
                 "</html>";
-    
-        // Envoyer l'email de confirmation au locataire
-        emailService.sendReservationEmail(userEmail, subjectForUser, bodyForUser);
-    
-        // Récupérer le propriétaire associé au logement
-        User proprietaire = createdReservation.getLogement().getUser();
-        if (proprietaire != null) {
-            // Préparer l'email pour le propriétaire
-            String ownerEmail = proprietaire.getEmail();
-            String subjectForOwner = "Nouvelle réservation pour votre logement";
-            String bodyForOwner = "<html>" +
-                    "<body>" +
-                    "<h2>Bonjour " + proprietaire.getNom() + ",</h2>" +
-                    "<p>Vous avez une nouvelle réservation pour votre logement.</p>" +
-                    "<h3>Détails de la réservation :</h3>" +
-                    "<ul>" +
-                    "<li>" + logementDetails + "</li>" +
-                    "<li><strong>Nom du locataire :</strong> " + authentication.getName() + "</li>" +
-                    "</ul>" +
-                    "<p>Merci de votre attention !</p>" +
-                    "<p>Cordialement,<br>L'équipe de réservation.</p>" +
-                    "</body>" +
-                    "</html>";
-    
-            // Envoyer l'email de notification au propriétaire
-            emailService.sendReservationEmail(ownerEmail, subjectForOwner, bodyForOwner);
-        }
-    
-        return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
+
+        // Envoyer l'email de notification au propriétaire
+        emailService.sendReservationEmail(ownerEmail, subjectForOwner, bodyForOwner);
     }
+
+    return new ResponseEntity<>(createdReservation, HttpStatus.CREATED);
+}
+
     
 
 
