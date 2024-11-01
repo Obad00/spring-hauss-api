@@ -150,11 +150,12 @@ Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
                         String userEmail = updatedReservation.getUser().getEmail();
                         String subject = "Mise à jour de votre réservation";
     
-                        // Détails du logement et du propriétaire
+                        // Détails du logement avec ajout de la localité
                         String logementDetails = "Nom du logement : " + updatedReservation.getLogement().getTitre() + "<br>" +
-                                                 "Adresse : " + updatedReservation.getLogement().getAdresse() + "<br>" +
+                                                 "Adresse : " + updatedReservation.getLogement().getAdresse().getRegions() + ", " +
+                                                 updatedReservation.getLogement().getAdresse().getLocalite() + "<br>" +
                                                  "Propriétaire : " + updatedReservation.getLogement().getUser().getNom() + " (" +
-                                                 updatedReservation.getLogement().getUser().getEmail() + ")"; // Supposant que l'email est aussi récupéré
+                                                 updatedReservation.getLogement().getUser().getEmail() + ")";
     
                         String text = "<html>" +
                                 "<head>" +
