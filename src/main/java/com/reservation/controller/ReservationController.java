@@ -225,15 +225,17 @@ Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
         combinedReservations.addAll(reservationsForOwnedLogements); // Ajouter les réservations liées aux logements
         combinedReservations.addAll(reservationsByUser); // Ajouter les réservations faites par l'utilisateur
     
-        // Transformer les réservations combinées en DTO
+       // Transformer les réservations combinées en DTO
         List<ReservationDTO> reservationDTOs = combinedReservations.stream()
-            .map(reservation -> new ReservationDTO(
-                reservation.getId(),
-                reservation.getStatut().toString(), // Convertir en String si c'est une énumération
-                reservation.getLogement(),
-                reservation.getUser() // Récupérer l'utilisateur qui a fait la réservation
-            ))
-            .collect(Collectors.toList());
+        .map(reservation -> new ReservationDTO(
+            reservation.getId(),                      // ID
+            reservation.getStatut().toString(),      // Status
+            reservation.getCreatedAt(),                // Creation Date
+            reservation.getLogement(),                // Logement
+            reservation.getUser()                     // User
+        ))
+        .collect(Collectors.toList());
+
     
         return ResponseEntity.ok(reservationDTOs);
     }
