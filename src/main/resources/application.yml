@@ -10,7 +10,7 @@ spring:
   
   ## Configuration de l'ORM JPA
   jpa:
-    database: railway # Le SGBD utilisé
+    database: MYSQL # Le SGBD utilisé
     show-sql: true # Afficher la requête SQL générée par Hibernate
     properties:
       hibernate:
