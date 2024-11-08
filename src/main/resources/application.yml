@@ -2,9 +2,10 @@
 spring:
   ## Configuration de la BD
   datasource:
-    url: jdbc:mysql://localhost:3306/db_hauss?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    # url: jdbc:mysql://localhost:3306/db_hauss?useSSL=false&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    url: mysql://root:hhnLYvyadyibjYUCINQGYyfJXtmEZjcp@junction.proxy.rlwy.net:25148/railway
     username: root
-    password: Iotr@2024
+    password: hhnLYvyadyibjYUCINQGYyfJXtmEZjcp
     driver-class-name: com.mysql.cj.jdbc.Driver
   
   ## Configuration de l'ORM JPA
