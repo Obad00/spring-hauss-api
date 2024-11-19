@@ -36,11 +36,19 @@ public class NotificationController {
         // Récupérer l'utilisateur authentifié
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-    
+        
         // Récupérer l'utilisateur depuis votre service
         User user = userService.findByEmail(email);
+        
+        // Vérifier que l'utilisateur existe (optionnel mais recommandé)
+        if (user == null) {
+            return ResponseEntity.badRequest().body(null); // Gérer le cas où l'utilisateur n'existe pas
+        }
     
-        // Créer la notification
+        // Associer l'utilisateur authentifié à la notification
+        notification.setUser(user);  // Ici, on lie l'utilisateur à la notification avant de l'enregistrer
+    
+        // Créer la notification et l'enregistrer
         Notification savedNotification = notificationService.createNotification(notification);
     
         // Récupérer tous les utilisateurs ayant le rôle PROPRIETAIRE
@@ -48,12 +56,13 @@ public class NotificationController {
     
         // Envoyer une notification et un e-mail à chaque PROPRIETAIRE
         for (User proprietaire : proprietaires) {
-            // Associer la notification à chaque propriétaire
+            // Créer une notification pour le propriétaire
             Notification proprietaireNotification = new Notification();
             proprietaireNotification.setSujet(notification.getSujet());
             proprietaireNotification.setMessage(notification.getMessage());
-    
-            // Enregistrer la notification
+            proprietaireNotification.setUser(proprietaire);  // Associer au propriétaire
+            
+            // Enregistrer la notification pour le propriétaire
             notificationService.createNotification(proprietaireNotification);
     
             // Envoyer un e-mail avec l'utilisateur associé
@@ -62,7 +71,6 @@ public class NotificationController {
     
         return ResponseEntity.ok(savedNotification);
     }
-    
     
 
 }
