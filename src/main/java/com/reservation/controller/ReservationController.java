@@ -83,8 +83,8 @@ Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
     String userEmail = authentication.getName(); // Ou obtenez l'email depuis l'objet `User`
 
     // Détails du logement
-    String logementDetails = "Nom du logement : " + createdReservation.getLogement().getTitre() + "<br>" +
-                             "Adresse : " + createdReservation.getLogement().getAdresse() + "<br>";
+    // String logementDetails = "Nom du logement : " + createdReservation.getLogement().getTitre() + "<br>" +
+    //                          "Adresse : " + createdReservation.getLogement().getAdresse() + "<br>";
 
     // Préparer l'email de confirmation pour le locataire
     String subjectForUser = "Confirmation de votre réservation";
@@ -92,10 +92,10 @@ Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
             "<body>" +
             "<h2>Bonjour,</h2>" +
             "<p>Votre réservation a bien été effectuée avec succès.</p>" +
-            "<h3>Détails de la réservation :</h3>" +
-            "<ul>" +
-            "<li>" + logementDetails + "</li>" +
-            "</ul>" +
+            "<h3>Vous receverez d'ici peu de temps une réponse de la part du propriétaire</h3>" +
+            // "<ul>" +
+            // "<li>" + logementDetails + "</li>" +
+            // "</ul>" +
             "<p>Merci de votre confiance !</p>" +
             "<p>Cordialement,<br>L'équipe de réservation.</p>" +
             "</body>" +
@@ -116,7 +116,7 @@ Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
                 "<p>Vous avez une nouvelle réservation pour votre logement.</p>" +
                 "<h3>Détails de la réservation :</h3>" +
                 "<ul>" +
-                "<li>" + logementDetails + "</li>" +
+                // "<li>" + logementDetails + "</li>" +
                 "<li><strong>Nom du locataire :</strong> " + authentication.getName() + "</li>" +
                 "</ul>" +
                 "<p>Merci de votre attention !</p>" +
