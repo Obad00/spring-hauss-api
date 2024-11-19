@@ -49,4 +49,10 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return user.isEnabled(); // Remplacez par le bon champ
     }
+
+    // Add the getId() method
+    public Long getId() {
+        return user.getId(); // Assuming your User entity has an `getId()` method
+    }
+    
 }

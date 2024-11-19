@@ -1,5 +1,6 @@
 package com.reservation.service;
 
+import com.reservation.entity.Logement;
 import com.reservation.entity.Reservation;
 import com.reservation.entity.User; // Assurez-vous d'importer votre entité User
 import com.reservation.enums.StatutReservation;
@@ -56,6 +57,10 @@ public class ReservationService {
         return savedReservation;
     }
     
+    public boolean reservationExists(Long userId, Long logementId) {
+        return reservationRepository.existsByUserIdAndLogementId(userId, logementId);
+    }
+    
 
     // Modifier le statut de la réservation
     public Optional<Reservation> updateReservationStatus(Long reservationId, StatutReservation newStatus) {
@@ -81,6 +86,11 @@ public class ReservationService {
             return reservationRepository.findByUserId(user.getId()); // Récupérer les réservations de cet utilisateur
         }
         return Collections.emptyList(); // Aucun utilisateur trouvé
+    }
+
+     public List<Reservation> getReservationsByLogements(List<Logement> logements) {
+        // Si vous passez une liste de logements, vous pouvez directement récupérer les réservations correspondantes
+        return reservationRepository.findByLogementIn(logements);
     }
     
     

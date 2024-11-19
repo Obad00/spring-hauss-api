@@ -32,7 +32,7 @@ public class LogementService {
         this.adresseRepository = adresseRepository;
     }
     @Transactional
-public Logement createLogement(@Valid Logement logement) {
+    public Logement createLogement(@Valid Logement logement) {
     // Sauvegarder l'adresse si elle existe
     Adresse adresse = logement.getAdresse();
     if (adresse != null) {
@@ -64,6 +64,10 @@ public Logement createLogement(@Valid Logement logement) {
 
     public List<Logement> getAllLogements() {
         return logementRepository.findAll();
+    }
+
+    public List<Logement> getLogementsByUserEmail(String email) {
+        return logementRepository.findByUserEmail(email);
     }
 
 
